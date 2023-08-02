@@ -3,6 +3,7 @@ from .forms import UserSignUpForm,UserLoginForm,PostForm
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.models import Group
+from django.core.cache import cache
 from .models import Post
 
 
@@ -22,9 +23,9 @@ def dashboard(request):
         posts = Post.objects.all()
         user = request.user
         full_name = user.get_full_name()
-        ip = request.session.get('ip',0)
+        ct = cache.get('count',0,version=user.pk)
         groups = user.groups.all()
-        return render(request,'blog/dashboard.html',{'posts':posts,'full_name':full_name,'groups':groups,'ip':ip})
+        return render(request,'blog/dashboard.html',{'posts':posts,'full_name':full_name,'groups':groups,'ct':ct})
     else:
         return HttpResponseRedirect('/login/')
 
